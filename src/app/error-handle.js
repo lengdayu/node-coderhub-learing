@@ -1,6 +1,8 @@
 const {
   NAME_OR_PASSWORD_IS_REQUIRED,
   NAME_ALREADY_EXIST,
+  USER_DOES_NOT_EXITS,
+  PASSWORD_IS_INCORRENT,
 } = require("../constants/error-type");
 
 const errorHandler = (error, ctx) => {
@@ -11,8 +13,16 @@ const errorHandler = (error, ctx) => {
       message = NAME_OR_PASSWORD_IS_REQUIRED;
       break;
     case NAME_ALREADY_EXIST:
-      status = 406;
+      status = 409;
       message = NAME_ALREADY_EXIST;
+      break;
+    case USER_DOES_NOT_EXITS:
+      status = 400;
+      message = USER_DOES_NOT_EXITS;
+      break;
+    case PASSWORD_IS_INCORRENT:
+      status = 400;
+      message = PASSWORD_IS_INCORRENT;
       break;
 
     default:
