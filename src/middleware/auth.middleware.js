@@ -1,7 +1,11 @@
+const JWT = require("jsonwebtoken");
+const { PUBLIC_KEY } = require("../app/config");
+
 const {
   NAME_OR_PASSWORD_IS_REQUIRED,
   USER_DOES_NOT_EXITS,
   PASSWORD_IS_INCORRENT,
+  UN_AUTHORIZATION,
 } = require("../constants/error-type");
 const service = require("../service/user.service");
 const md5Password = require("../utils/password-handle");
@@ -17,7 +21,6 @@ const verifyLogin = async (ctx, next) => {
 
   //判断用户是否存在
   const [rows] = await service.getUserByName(name);
-  console.log(rows);
   if (!rows.length) {
     const error = new Error(USER_DOES_NOT_EXITS);
     return ctx.app.emit("error", error, ctx);
@@ -28,9 +31,29 @@ const verifyLogin = async (ctx, next) => {
     const error = new Error(PASSWORD_IS_INCORRENT);
     return ctx.app.emit("error", error, ctx);
   }
+
+  ctx.user = rows[0];
+
   await next();
 };
 
+const verifyAuth = async (ctx, next) => {
+  //1.获取token
+  const authorization = ctx.headers.authorization;
+  const token = authorization.replace("Bearer ", "");
+
+  //2.验证token(ID,NAME,IAT,EXP)
+  try {
+    const result = JWT.verify(token, PUBLIC_KEY, { algorithms: ["RS256"] });
+    ctx.user = result;
+    console.log(result);
+    await next();
+  } catch (error) {
+    const err = new Error(UN_AUTHORIZATION);
+    ctx.app.emit("error", err, ctx);
+  }
+};
 module.exports = {
   verifyLogin,
+  verifyAuth,
 };
