@@ -4,6 +4,7 @@ const {
   USER_DOES_NOT_EXITS,
   PASSWORD_IS_INCORRENT,
   UN_AUTHORIZATION,
+  UNPERMISSION,
 } = require("../constants/error-type");
 
 const errorHandler = (error, ctx) => {
@@ -28,6 +29,10 @@ const errorHandler = (error, ctx) => {
     case UN_AUTHORIZATION:
       status = 401;
       message = UN_AUTHORIZATION;
+      break;
+    case UNPERMISSION:
+      status = 401;
+      message = UNPERMISSION;
       break;
 
     default:
